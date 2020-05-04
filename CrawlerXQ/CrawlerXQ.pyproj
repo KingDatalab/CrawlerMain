@@ -11,7 +11,7 @@
     <OutputPath>.</OutputPath>
     <Name>CrawlerXQ</Name>
     <RootNamespace>CrawlerXQ</RootNamespace>
-    <InterpreterId>Global|PythonCore|3.7</InterpreterId>
+    <InterpreterId>Global|PythonCore|3.6</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>

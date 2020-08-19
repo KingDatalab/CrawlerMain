@@ -53,24 +53,27 @@ class CookiesGenerate(object):
         self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="app"]/nav/div[1]/div[2]/div/div'))).click()
         #找到登录界面的微博登录按钮并点击
         self.wait.until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[2]/div[1]/div/div/div[2]/div[5]/ul/li[3]/a/i'))).click()
+        # 
+        self.browser.switch_to.window(self.browser.window_handles[1])
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="jump_login_url_a"]'))).click()
         #找到账号密码登录按钮并点击
         time.sleep(0.5)
-        self.browser.switch_to.window(self.browser.window_handles[1])
-        input_u = self.browser.find_element_by_id('userId')
+        #self.browser.switch_to.window(self.browser.window_handles[1])
+        input_u = self.browser.find_element_by_id('username')
         input_u.send_keys(self.username)
-        input_p = self.browser.find_element_by_id('passwd')
+        input_p = self.browser.find_element_by_id('password')
         input_p.send_keys(self.password)
 
     ###################-----------OCR验证码------------------------#####################
     def ocr_main(self):
         # 获取验证码图片并下载到本地
         time.sleep(1)
-        scimg = self.wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="outer"]/div/div[2]/form/div/div[1]/div[1]/p[3]/span/img')))
+        scimg = self.wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="check_img"]')))
         self.browser.save_screenshot(self.Imgpath)
-        top = 207
+        top = 305
         bottom = top + 35
-        left = 513.75
-        right = left + 75
+        left = 415
+        right = left + 100
         img = Image.open(self.Imgpath).crop((left,top,right,bottom))
         img = img.convert('L')
         img.save(self.Imgpath)
@@ -79,17 +82,17 @@ class CookiesGenerate(object):
         text = self.captcha_identify()
         
         if text:
-            input_c = self.wait.until(EC.presence_of_element_located((By.XPATH,'//*[@id="outer"]/div/div[2]/form/div/div[1]/div[1]/p[3]/input')))
+            input_c = self.wait.until(EC.presence_of_element_located((By.XPATH,'//*[@id="door"]')))
             input_c.send_keys(text)
-            self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="outer"]/div/div[2]/form/div/div[2]/div/p/a[1]'))).click()
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="vForm"]/div[2]/div/ul/li[7]/div[1]/input'))).click()
         else:
-            self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="outer"]/div/div[2]/form/div/div[1]/div[1]/p[3]/a'))).click()
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="check_img"]'))).click()
             self.ocr_main()
             
-    def input_captcha(self, captcha_text):
-        input_c = self.browser.find_element_by_xpath('//*[@id="outer"]/div/div[2]/form/div/div[1]/div[1]/p[3]/input')
-        input_c.send_keys(captcha_text)
-        self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="outer"]/div/div[2]/form/div/div[2]/div/p/a[1]'))).click()
+    #def input_captcha(self, captcha_text):
+    #    input_c = self.browser.find_element_by_xpath('//*[@id="outer"]/div/div[2]/form/div/div[1]/div[1]/p[3]/input')
+    #    input_c.send_keys(captcha_text)
+    #    self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="outer"]/div/div[2]/form/div/div[2]/div/p/a[1]'))).click()
 
     def get_file_content(self, filePath):
         with open(filePath, 'rb') as fp:
@@ -277,15 +280,16 @@ class CookiesGenerate(object):
                 time.sleep(0.5)
                 #OCR验证码识别
                 self.Imgpath = 'login/template/screenImg.png'
-                self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="outer"]/div/div[2]/form/div/div[2]/div/p/a[1]'))).click()
+                self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="vForm"]/div[2]/div/ul/li[7]/div[1]/input'))).click()
                 print('开始进行OCR验证')
                 ocr_count = 1
                 while True:
                     self.ocr_main()
                     time.sleep(2)
-                    if self.browser.current_url == 'https://api.weibo.com/oauth2/authorize':
+                    if 'https://api.weibo.com/oauth2/authorize' in self.browser.current_url:
+                        self.browser.switch_to.window(self.browser.window_handles[1])
                         try:
-                            self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="outer"]/div/div[2]/form/div/div[2]/div/p/a[1]'))).click()
+                            self.wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="email"]'))).click()
                         except:
                             print('已连接雪球')
                         # 点击允许授权
